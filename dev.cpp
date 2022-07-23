@@ -1,38 +1,55 @@
 #include <string>
 #include "raylib.h"
 #define BUFFER_LIMIT 100000000
-#define CURSOR "_"
+#define CURSOR "|"
 
 int FONT_SIZE = 20;
 float MARGIN = 10;
-int FONT_SPACING = MARGIN / 2;
+int FONT_SPACING = 2;
 std::string filename;
 
 struct {  // memory time
-    int start = 0;
     std::string Text = "";
-    int end = 0;
+
+    size_t cursor = 0;
 
     bool isFull() {
         return Text.size() > BUFFER_LIMIT ? true : false;
     }
 
-    bool insertText(std::string text, int from = 0, int to = 0) {
-        if (isFull())
-            return false;
-        if (!from && !to)
-            Text += text;
-
-        else if (from > start && to < end)
-            Text = Text.substr(0, from) + text + Text.substr(to, Text.npos);
-        else
-            return false;
-
-        return true;
+    void placeCursor(size_t at) {
+        if (Text.size() <= at || at < 0)
+            return;
+        Text.erase(cursor, 1);
+        Text.insert(at, CURSOR);
+        cursor = at;
     }
+    void placeCursorEnd() {
+        Text.append(CURSOR);
+        cursor = Text.size() - 1;
+    }
+    void writeText(std::string text) {
+        insertText(text, cursor);
+        cursor += text.size();
+    }
+    void insertText(std::string text, size_t from = 0) {
+        if (isFull())
+            return;
+        // TODO calculate the location of the cursor
+        Text.insert(from, text);
+    }
+    void removeText(size_t from, size_t amount = 1) {
+        if (from + amount > Text.size() - 1 || from < 0)
+            return;
 
+        // TODO calculate the location of the cursor
+        Text.erase(from, amount);
+    }
     void eraseText() {
-        Text = Text.substr(0, Text.size() - 1);
+        if (!cursor)
+            return;
+        removeText(cursor - 1);
+        cursor--;
     }
 
     int count(char chr) {  // counts the occurance of a char
@@ -47,6 +64,7 @@ struct {  // memory time
 void loadFile(std::string& fname) {
     char* text = LoadFileText(fname.c_str());
     Memory.insertText(text);
+    Memory.placeCursorEnd();
     UnloadFileText(text);
     delete[] text;
 }
@@ -76,31 +94,42 @@ int main(int argc, char* argv[]) {
         // if (key )
         //     Memory.insertText(std::to_string((char)GetKeyPressed()));
         if (TextInput != "")
-            Memory.insertText(TextInput);
+            Memory.writeText(TextInput);
 
         if (IsKeyPressed(KEY_BACKSPACE)) {
             Memory.eraseText();
         }
 
         if (IsKeyPressed(KEY_ENTER)) {
-            Memory.insertText("\n");
+            Memory.writeText("\n");
         }
 
         if (IsKeyPressed(KEY_TAB)) {
-            Memory.insertText("\t");
+            Memory.writeText("\t");
         }
 
         if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_S)) {
+            Memory.Text.erase(Memory.cursor, 1);
             SaveFileText(filename.c_str(), Memory.Text.data());
+            Memory.Text.insert(Memory.cursor, CURSOR);
         }
 
         if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_Q)) {
             CloseWindow();
         }
 
+        if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_V)) {
+            Memory.writeText(GetClipboardText());
+        }
+
+        if (IsKeyPressed(KEY_LEFT))
+            Memory.placeCursor(Memory.cursor - 1);
+        if (IsKeyPressed(KEY_RIGHT))
+            Memory.placeCursor(Memory.cursor + 1);
+
         BeginDrawing();
         ClearBackground(CLITERAL(Color){17, 17, 17, 255});
-        DrawTextPro(GetFontDefault(), (Memory.Text + CURSOR).data(),
+        DrawTextPro(GetFontDefault(), Memory.Text.data(),
                     Vector2{MARGIN, MARGIN}, Vector2{0, 0}, 0, FONT_SIZE,
                     FONT_SPACING, WHITE);
 
