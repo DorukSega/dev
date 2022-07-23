@@ -13,7 +13,9 @@ struct {  // memory time
 
     size_t cursor = 0;
 
-    bool isFull() { return Text.size() > BUFFER_LIMIT ? true : false; }
+    bool isFull() {
+        return Text.size() > BUFFER_LIMIT ? true : false;
+    }
 
     void placeCursor(size_t at) {
         if (Text.size() <= at || at < 0)
@@ -118,7 +120,9 @@ int main(int argc, char* argv[]) {
         }
 
         if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_V)) {
-            Memory.writeText(GetClipboardText());
+            const char* clipboard = GetClipboardText();
+            if (clipboard)
+                Memory.writeText(clipboard);
         }
 
         if (IsKeyPressed(KEY_LEFT))
