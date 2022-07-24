@@ -13,9 +13,7 @@ struct {  // memory time
 
     size_t cursor = 0;
 
-    bool isFull() {
-        return Text.size() > BUFFER_LIMIT ? true : false;
-    }
+    bool isFull() { return Text.size() > BUFFER_LIMIT ? true : false; }
 
     void placeCursor(size_t at) {
         if (Text.size() <= at || at < 0)
@@ -61,11 +59,11 @@ struct {  // memory time
     }
 } Memory;
 
-void loadFile(std::string& fname) {
+void loadFile(std::string fname) {
     char* text = LoadFileText(fname.c_str());
     Memory.insertText(text);
     Memory.placeCursorEnd();
-    UnloadFileText(text);
+    // UnloadFileText(text);
     delete[] text;
 }
 
@@ -116,6 +114,7 @@ int main(int argc, char* argv[]) {
 
         if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_Q)) {
             CloseWindow();
+            exit(1);
         }
 
         if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_V)) {
