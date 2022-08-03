@@ -73,10 +73,6 @@ void eofCursor() {
     // cursor = getLocation(strlen(files[FileFocused]));
 }
 
-void placeCursor(size_t at) {
-    cursor = getLocation(at);
-    cursorIndex = at;
-}
 int main(int argc, const char* argv[]) {
     if (argc > 1) {
         if (FileExists(argv[1])) {
