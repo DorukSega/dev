@@ -84,15 +84,12 @@ int main(int argc, char* argv[]) {
     SetWindowState(FLAG_WINDOW_RESIZABLE);
     SetTargetFPS(60);
 
-    ClearBackground(CLITERAL(Color){17, 17, 17, 255});
-
     while (!WindowShouldClose()) {  // detect window closure
+
         char x[] = {(char)GetCharPressed(), '\0'};
-        // const float currentTime = GetFrameTime();
 
         std::string TextInput = x;
-        // if (key )
-        //     Memory.insertText(std::to_string((char)GetKeyPressed()));
+
         if (TextInput != "")
             Memory.writeText(TextInput);
 
@@ -129,8 +126,8 @@ int main(int argc, char* argv[]) {
             Memory.placeCursor(Memory.cursor - 1);
         if (IsKeyPressed(KEY_RIGHT))
             Memory.placeCursor(Memory.cursor + 1);
-
         BeginDrawing();
+
         ClearBackground(CLITERAL(Color){17, 17, 17, 255});
         DrawTextPro(GetFontDefault(), Memory.Text.data(),
                     Vector2{MARGIN, MARGIN}, Vector2{0, 0}, 0, FONT_SIZE,
